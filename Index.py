@@ -38,17 +38,18 @@ def listToString(s):
     return str1
 
 #also change these two paths 
-file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping.json"
+#file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping.json"
+file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping2.json"
 basePath = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW"
 with open(file, 'r') as f:
 
     json_object = json.load(f)
-    index = 0
+    #index = 0
     for path in json_object : 
         
-        if(index == 5):
-            break 
-        index +=1
+        # if(index == 5):
+        #     break 
+        # index +=1
         objId = path
         split = objId.split("/")
         dataPath= basePath + "\\" + split[0] + "\\" + split[1]
@@ -62,51 +63,54 @@ with open(file, 'r') as f:
             textSet = soup.find_all(tag)
             for heading in textSet:
                 text = heading.text.strip()
-                #text.strip()       
-        # splitText = text.split()
-        # textList = []
-        # limit = 50000
-        # if len(splitText) > 50000:
-        #     while len(splitText) > 50000:
-        #         textList.append(splitText[0 : 50000])
-        #         splitText = splitText[50001 : len(splitText)-1]
-        # else:
-        #     textList.append(splitText)
+
+                #splitting up into section when they are too big.       
+                splitText = text.split()
+                textList = []
+                limit = 50000
+                if len(splitText) > 50000:
+                    while len(splitText) > 50000:
+                        textList.append(splitText[0 : 50000])
+                        splitText = splitText[50001 : len(splitText)-1]
+                else:
+                    textList.append(splitText)
 
                 lemmaList = []
                 
-                #tokenize the text for the tag
-                sp = spacy.load('en_core_web_sm')
-                sp.max_length = 3000000
-                tokenizedText = sp(text)
-                #token list
-                tokenizedText = [x for x in tokenizedText if str(x) not in stopWords]
-                for token in tokenizedText:
-                    
-                    lemmaStr = str (token.lemma_)
+                for textSegments in textList:
+                    text = " ".join(textSegments)
+                    #tokenize the text for the tag
+                    sp = spacy.load('en_core_web_sm')
+                    sp.max_length = 3000000
+                    tokenizedText = sp(text)
+                    #token list
+                    tokenizedText = [x for x in tokenizedText if str(x) not in stopWords]
+                    for token in tokenizedText:
+                        
+                        lemmaStr = str (token.lemma_)
 
-                    if all(x.isalnum() for x in lemmaStr):
-                        lemmaList.append(lemmaStr)
+                        if all(x.isalnum() for x in lemmaStr):
+                            lemmaList.append(lemmaStr)
 
-                for lemma in lemmaList:
-
-                    alphabetOrder = ord(lemma[0])
-                    
-                    if 47 < alphabetOrder < 58: #Numbers 48 = 0, 57 = 9
+                    for lemma in lemmaList:
                         this = (objId, tag)
-                        if lemma not in indexArray[0].keys():
-                            indexArray[0][lemma] = []
-                            
-                            indexArray[0][lemma].append(this)
-                        else:
-                            this = (objId, tag)
-                            indexArray[0][lemma].append(this)
-                    elif 96 < alphabetOrder < 123:
-                        if lemma not in indexArray[alphabetOrder-96].keys():
-                            indexArray[alphabetOrder-96][lemma] = []
-                            indexArray[alphabetOrder-96][lemma].append(this)
-                        else:
-                            indexArray[alphabetOrder-96][lemma].append(this)
+                        alphabetOrder = ord(lemma[0])
+                        
+                        if 47 < alphabetOrder < 58: #Numbers 48 = 0, 57 = 9
+                            #this = (objId, tag)
+                            if lemma not in indexArray[0].keys():
+                                indexArray[0][lemma] = []
+                                
+                                indexArray[0][lemma].append(this)
+                            else:
+                                #this = (objId, tag)
+                                indexArray[0][lemma].append(this)
+                        elif 96 < alphabetOrder < 123:
+                            if lemma not in indexArray[alphabetOrder-96].keys():
+                                indexArray[alphabetOrder-96][lemma] = []
+                                indexArray[alphabetOrder-96][lemma].append(this)
+                            else:
+                                indexArray[alphabetOrder-96][lemma].append(this)
         
         print ("Last File Processed: " + objId)
 #print(indexArray)
@@ -134,16 +138,16 @@ for alphabetDict in indexArray: #for each dictionary in list
             
              #incase
             
-            docFrequency = len(set(idList))
+            #docFrequency = len(set(idList))
             
             for ids in idList:
                 tfreq = len(idList[ids])
                 tflog = math.log(tfreq)
-                print(tfreq)
-                print(tflog)
-                dflog = math.log(N/docFrequency)
-                print(dflog)
-                docWeight = round((1 + tflog) * dflog, 3)
+                # print(tfreq)
+                # print(tflog)
+                #dflog = math.log(N/docFrequency)
+                #print(dflog)
+                docWeight = round((1 + tflog), 3)
                 output += ids + "/" + str(docWeight) + "/" + ",".join(idList[ids]) 
                  
             #for each docID in counter, we will calculate the weight and store info
