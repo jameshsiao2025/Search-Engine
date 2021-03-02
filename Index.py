@@ -38,8 +38,8 @@ def listToString(s):
     return str1
 
 #also change these two paths 
-#file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping.json"
-file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping2.json"
+#file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\bookkeeping2.json"
+file = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW\17001.json"
 basePath = r"C:\Users\james\UC Irvine\cs121 information retrieval\Assignment Three part 1\webpages\WEBPAGES_RAW"
 with open(file, 'r') as f:
 
@@ -122,7 +122,7 @@ with open(file, 'r') as f:
 #print statements for index.txt
 nameCounter = 0
 for alphabetDict in indexArray: #for each dictionary in list
-    fileName = str(nameCounter) + "test.txt" 
+    fileName = str(nameCounter) + "ThirtyToForty.txt" 
     with codecs.open(fileName, "w", 'UTF-8') as file:        
         for lem in alphabetDict: #for each lemma in dictionary
             #term frequency
@@ -148,7 +148,7 @@ for alphabetDict in indexArray: #for each dictionary in list
                 #dflog = math.log(N/docFrequency)
                 #print(dflog)
                 docWeight = round((1 + tflog), 3)
-                output += ids + "/" + str(docWeight) + "/" + ",".join(idList[ids]) 
+                output += " "+ ids + "/" + str(docWeight) + "/" + ",".join(idList[ids]) 
                  
             #for each docID in counter, we will calculate the weight and store info
             #then we have to go back and match the doc Ids with the tags, and print into text file. 
