@@ -4,6 +4,9 @@ import math
 import webbrowser
 from tkinter import *
 from collections import defaultdict
+from tkinter import ttk as ttk
+from bs4 import BeautifulSoup
+
 
 indexData = defaultdict(dict)
 N = 37497
@@ -27,16 +30,18 @@ if __name__ == "__main__":
     #GUI Set up
     queryWin = Tk()
     queryWin.title("Let's Grab Boba Team 15_SEO")
-    queryWin.geometry("2500x1000")
+    queryWin.geometry("1600x1000")
+
+    
 
     #Label for Title
     SEOname = Label(queryWin, text= "Geegle", fg = "red")
     
-    SEOname.config(font=("Helvetica", 50))
-    SEOname.place(relx = 0.5, rely = 0.3, anchor = 'center')
+    SEOname.config(font=("Helvetica", 35))
+    SEOname.place(relx = 0.5, rely = 0.05, anchor = 'center')
     #search box 
     searchBox = Entry(queryWin, width = 45)
-    searchBox.place(relx = 0.5, rely = 0.37, anchor = 'center')
+    searchBox.place(relx = 0.5, rely = 0.09, anchor = 'center')
     
     result = {}
     webbrowser.register('chrome', None, webbrowser.BackgroundBrowser("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"))
@@ -161,6 +166,7 @@ if __name__ == "__main__":
             data = ""
             with open(link, 'r') as f:
                 data = f.read()
+                
             newPath = link + ".html"
             with open(newPath, 'w') as f1:
                 f1.write(data)
@@ -181,6 +187,9 @@ if __name__ == "__main__":
             for widgets in resultDisplay.winfo_children():
                 widgets.destroy()
 
+            resultBox= ttk.Labelframe(resultDisplay, text="Results")
+            resultBox.place(relx = 0.5, rely = 0.5, anchor = 'center')
+            resultBox.pack()
 
             for keys in resultList:
                 #print(keys)
@@ -189,11 +198,38 @@ if __name__ == "__main__":
                 link = json_object[keys]
                 #displayResultLine = Button(resultDisplay, text =  link, fg ="blue", command = lambda: callback(self.cget("text")) )
                 #construct file path and pass into callback
+                
+
+
                 split = keys.split("/")
                 dataPath= basePath + "\\" + split[0] + "\\" + split[1]
-                displayResultLine = Button(resultDisplay, text = str(resultCount) + ". " + link, fg ="blue", command=lambda url = dataPath: callback(url))
+                htmlData = open(dataPath, encoding = "UTF-8")
+                soup = BeautifulSoup(htmlData, "lxml")
                 
+                #TO DO: PARSE THE TITLE
+               
+                description = soup.get_text().replace("\n", " ")
+                if len(description) > 105:
+                    description = description[0:105]
+                
+                description = " ".join(description.split())
+                
+                print("description: " + description)
+               
+                container = Label(resultBox, width = 200, height = 100)
+                container.pack()
+                title = ""
+                if len(link) > 45:
+                    title = link[:45] + "..."
+                else:
+                    title = link
+                displayResultLine= Button(container, text= str(resultCount)+". " +title , fg = "blue", borderwidth= 0, command=lambda url = dataPath: callback(url))
+                displayResultLine.config(font = ('Calibri', 9))
                 displayResultLine.pack()
+                descriptionLabel = Label(container, text = description + "1")
+                descriptionLabel.config(font = ('Calibri', 7))
+                descriptionLabel.pack()
+
             
                 print(str(resultCount) + ". " + link)
             if len(resultList) == 0:
@@ -203,9 +239,9 @@ if __name__ == "__main__":
         return 
     
     searchButton = Button(queryWin, text = "Search", command = lambda: getQuery())
-    searchButton.place(relx = 0.5, rely = 0.40, anchor = 'center') 
+    searchButton.place(relx = 0.5, rely = 0.12, anchor = 'center') 
 
-    resultDisplay = Frame(queryWin)
-    resultDisplay.place(relx = 0.5, rely = 0.7, anchor = 'center')
+    resultDisplay = ttk.Panedwindow(queryWin, orient= VERTICAL)
+    resultDisplay.place(relx = 0.5, rely = 0.56, anchor = 'center')
     
     queryWin.mainloop()
